@@ -26,6 +26,63 @@ import uuid;
 from walsoc import *;
 import time;
 
+
+def val(num=None,dbg=False):
+	out=0.0;#output
+	sg=1;	#sign
+	flg=0;	#flag (number started)
+	fp=0;	#flag (decimal point position negative)
+	
+	for f in str(num):
+		if(f=="-"):
+			sg*=-1;
+		else:
+			if(not flg):
+				if(('0'<=f	and
+					f<='9') or
+					f=="."):
+						flg=1;
+						if(f=="."):
+							fp=1;
+						else:
+							if(fp):
+								out+=int(f)*(10**(-fp));
+								if(dbg):
+									print("D:",out,"\t",int(f),"x10^",(-fp));
+								fp+=1;
+							else:
+								out=out*10+int(f);
+								if(dbg):
+									print("E:",out);
+			else:
+				if(('0'<=f	and
+					f<='9') or
+					f=="."):
+					
+					flg=1;
+					if(f=="."):
+						fp=1;
+					else:
+						if(fp):
+							out+=int(f)*(10**(-fp));
+							if(dbg):
+								print("D:",out,"\t",int(f),"x10^",(-fp));
+							fp+=1;
+							
+						else:
+							out=out*10+int(f);
+							if(dbg):
+								print("E:",out);
+				else:
+					break;
+	if(fp>0):
+		out=int(out*(10**(fp-1)));
+		out=float(sg*out*(10**(-fp+1)));
+	else:
+		out=out*sg;
+		
+	return(out);
+
 BR="\n";
 
 def timer():
@@ -76,17 +133,17 @@ class baseData:
 	Ids=[];
 	Names=[];
 	
-def getUniq(val=None):
-	if (val==None):
-		val=uuid.uuid4().int;
+def getUniq(valor=None):
+	if (valor==None):
+		valor=uuid.uuid4().int;
 	else:
 		if(len(Component.Ids)>0):
-			val=(uuid.uuid1(node=max(Component.Ids)).int)%2207 +3;
+			valor=(uuid.uuid1(node=max(Component.Ids)).int)%2207 +3;
 		else:
-			val=(uuid.uuid1(node=22).int)% 2207+1;
-	while(val in baseData.Ids):
-		val=uuid.uuid4().int;
-	return(val);
+			valor=(uuid.uuid1(node=22).int)% 2207+1;
+	while(valor in baseData.Ids):
+		valor=uuid.uuid4().int;
+	return(valor);
 
 def inList(what,where):
 	try:
@@ -133,9 +190,9 @@ class Component(baseData):
 		else:
 			return(None);
 	
-	def getIndex(self,val):
+	def getIndex(self,valor):
 		try:
-			return(self.ndx.index(val));
+			return(self.ndx.index(valor));
 		except:
 			return(0);
 		
@@ -163,18 +220,18 @@ class Component(baseData):
 			Component.Components.append(self);
 		
 		
-	def title(self,val=None):
-		if(val!=None):
-			self.prop[self.getIndex("Description")].setValue(val);
+	def title(self,valor=None):
+		if(valor!=None):
+			self.prop[self.getIndex("Description")].setValue(valor);
 		else:
 			return(self.prop[self.getIndex("Description")].getValue());
 	
-	def set(self,name=None,val=None):
+	def set(self,name=None,valor=None):
 		if(name==None):
 			name="description";
 		name=filterName(name);
-		if(val!=None):
-			self.prop[self.getIndex(name)].setValue(val);
+		if(valor!=None):
+			self.prop[self.getIndex(name)].setValue(valor);
 		
 		return(self.prop[self.getIndex(name)].getValue());
 	
@@ -184,6 +241,23 @@ class Component(baseData):
 			out+=str(f)+BR;
 		return(out);
 	
+	def setPosition(self,x=None,y=None):
+		if(x!=None):
+			x=val(x);
+			self.prop[getIndex("x")].setValue(x);
+		if(y!=None):
+			y=val(y);
+			self.prop[getIndex("y")].setValue(y);
+	
+	
+	def setPos(self,vect=[None,None]):
+		try:
+			x=vect[0];
+			y=vect[1];
+			self.setPosition(x,y);
+		except:
+			pass;
+	
 def listComponents():
 	for f in Component.Components:
 		print(f.title());
@@ -191,7 +265,7 @@ def listComponents():
 def main(args):
 	Main=Component(Name="Principal",title="No sé",width=320,height=200);
 	Main.title("Algo");
-	Main.set("description","Agenda");
+	Main.set("description","WhatAnAgenda");
 	gotoxy(1,1);
 	listComponents();
 	print(Main.getProps());
