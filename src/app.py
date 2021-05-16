@@ -26,6 +26,8 @@ import uuid;
 from walsoc import *;
 import time;
 
+BR="\n";
+
 def timer():
 	return(time.time());
 
@@ -106,7 +108,7 @@ class Component(baseData):
 	"class,cursor,enabled,font,forecolor,help,icon,"+\
 	"maximize,minimize,opacity,padding,"+\
 	"righttoleft,showicon,showintaskbar,"+\
-	"value,height,weight,minheight,minwidth,maxheight,maxwidth,x,y";
+	"value,height,width,minheight,minwidth,maxheight,maxwidth,x,y";
 	Defaults=[	None,"Untitled",None,"#000",None,None,
 				"standard","default",True,
 				"consolan.ttf","#eee",None,None,
@@ -166,17 +168,34 @@ class Component(baseData):
 			self.prop[self.getIndex("Description")].setValue(val);
 		else:
 			return(self.prop[self.getIndex("Description")].getValue());
-			
+	
+	def set(self,name=None,val=None):
+		if(name==None):
+			name="description";
+		name=filterName(name);
+		if(val!=None):
+			self.prop[self.getIndex(name)].setValue(val);
+		
+		return(self.prop[self.getIndex(name)].getValue());
+	
+	def getProps(self):
+		out="";
+		for f in self.prop:
+			out+=str(f)+BR;
+		return(out);
+	
 def listComponents():
 	for f in Component.Components:
 		print(f.title());
 
 def main(args):
-	Component(Name="Principal",title="Agenda",minWidth=640,minHeight=480);
-	
-	
+	Main=Component(Name="Principal",title="No sé",width=320,height=200);
+	Main.title("Algo");
+	Main.set("description","Agenda");
 	gotoxy(1,1);
 	listComponents();
+	print(Main.getProps());
+	
 	for f in range(5):
 		gotoxy(5+f,5);
 		color(0,f);
