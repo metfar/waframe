@@ -174,9 +174,11 @@ def listComponents():
 def main(args):
 	Component(Name="Principal",title="Agenda",minWidth=640,minHeight=480);
 	
+	
+	gotoxy(1,1);
 	listComponents();
 	for f in range(5):
-		gotoxy(5+f,21);
+		gotoxy(5+f,5);
 		color(0,f);
 		print(".");
 		pause(1);
@@ -187,4 +189,5 @@ def main(args):
 
 if __name__ == '__main__':
 	iconify();
+	clrscr();
 	Exit(main(["World"]+list(sys.argv)));
